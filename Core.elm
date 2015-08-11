@@ -24,16 +24,16 @@ move lst =
 moveRows: Direction -> Model -> Model
 moveRows direction model = 
   let
-    moveLeft = map (reverse >> move >> reverse)
-    moveRight = map move
+    moveLeft = map move
+    moveRight = map (reverse >> move >> reverse)
     c = model.cells
   in 
     {model | cells <- 
         case direction of
             L -> moveLeft c                   {-- left --}
             R -> moveRight c                   {-- right --}
-            U -> trans c |> moveRight |> trans {-- up --}
-            D -> trans c |> moveLeft |> trans {-- down --}
+            U -> trans c |> moveLeft |> trans {-- up --}
+            D -> trans c |> moveRight |> trans {-- down --}
             _ -> c
     }
 

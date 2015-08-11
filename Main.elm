@@ -4,7 +4,9 @@ import Graphics.Element as GE exposing(Element, show, flow, left, down)
 import Random
 import Keyboard
 import Signal
+import Html exposing (Html, div)
 import Debug
+import UI exposing(mainView)
 import List as List exposing(isEmpty, append, map, reverse, map4, filter, 
   length, sum, foldr, concat, take)
 
@@ -30,9 +32,9 @@ update arrows model =
             _ -> moveRows direction model |> replaceRandomZero
 
 
-view: Model -> Element
-view {cells} = map (map show >> flow left) cells |> flow down
+--view: Model -> Element
+--view {cells} = map (map show >> flow left) cells |> flow down
 
 
-main : Signal Element
-main = Signal.map view (Signal.foldp update initModel Keyboard.arrows)
+main : Signal Html
+main = Signal.map mainView (Signal.foldp update initModel Keyboard.arrows)
