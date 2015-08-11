@@ -1,4 +1,8 @@
-module Core (Model, getDirection, moveRows, replaceRandomZero, Direction(..)) where
+module Core (Model, getDirection, 
+  moveRows, 
+  replaceRandomZero, 
+  replaseZeroNTimes,
+  Direction(..)) where
 
 import List as List exposing(append, map, reverse, length, concat)
 import Array as Array exposing(fromList, get)
@@ -56,7 +60,11 @@ replaceRandomZero model =
          | otherwise -> model.cells
   in
     {model | cells <- newCells, seed <- newSeed}
+
     
+replaseZeroNTimes n model =
+  if | n > 0 -> replaseZeroNTimes (n - 1) (replaceRandomZero model)
+     | otherwise -> model
 
 getDirection: {x: Int, y: Int} -> Direction
 getDirection {x, y} =
