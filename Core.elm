@@ -4,6 +4,7 @@ import List as List exposing(append, map, reverse, length, concat)
 import Array as Array exposing(fromList, get)
 import Dict
 import Random
+import Maybe exposing(Maybe(..))
 import Utils exposing(trans, replaceZero, zerosMap)
 
 type alias Cells = List (List Int)
@@ -46,8 +47,12 @@ replaceRandomZero model =
     generator = Random.int 0 zerosCount
     (zeroIdx, newSeed) = Random.generate generator model.seed
     replaceVal = if zeroIdx % 2 == 0 then 2 else 4
+    replaceIdx = Dict.get zeroIdx zeros
     newCells =
-      if | zerosCount > 0 -> replaceZero zeroIdx replaceVal model.cells
+      if | zerosCount > 0 ->
+            case replaceIdx of
+              Just idx -> replaceZero idx replaceVal model.cells
+              Nothing -> model.cells
          | otherwise -> model.cells
   in
     {model | cells <- newCells, seed <- newSeed}
