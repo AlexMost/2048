@@ -28,10 +28,13 @@ update: {x: Int, y: Int} -> Model -> Model
 update arrows model =
     let
         direction = (getDirection arrows)
+        movedModel = moveRows direction model
+        modelWasChanged = model /= movedModel
     in
-        case direction  of
-            N -> model
-            _ -> moveRows direction model |> replaceRandomZero
+        case (direction, modelWasChanged)  of
+            (N, _) -> model
+            (_, False) -> model
+            _ -> replaceRandomZero movedModel
 
 
 main : Signal Html
