@@ -7,6 +7,7 @@ import ElmTest.Runner.Element exposing (runDisplay)
 import Utils exposing (trans, zerosMap, replaceZero)
 import List exposing(map)
 import Dict exposing(Dict)
+import Core exposing(bubbleZeros, move)
 
 {-- trans test --}
 initial = [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]
@@ -26,9 +27,27 @@ replaceZeroExpected = [[1, 2, 3, 4], [0, 0, 2, 0], [1, 2, 3, 4], [1, 2, 3, 4]]
 replaceZeroActual = replaceZero 6 2 replaceZeroInitial
 testReplaceZero = test "reaplace zero" (assertEqual replaceZeroExpected replaceZeroActual)
 
+{-- bubble zeros test --}
+bubbleZerosInitial = [0, 1, 0, 1]
+bubbleZerosExpecetd = [1, 1, 0, 0]
+bubbleZerosActual = bubbleZeros bubbleZerosInitial
+testBubbleZeros = test "bubble zeros" (assertEqual bubbleZerosExpecetd bubbleZerosActual)
+
+{-- test move --}
+moveInitial = [0, 1, 0, 1]
+moveExpected = [2, 0, 0, 0]
+moveActual = move moveInitial
+testMove = test "test move" (assertEqual moveExpected moveActual)
+
 tests : Test
 tests = suite "Utils test suite"
-        [testTrans, testZerosMap, testReplaceZero]
+        [
+              testTrans
+            , testZerosMap
+            , testReplaceZero
+            , testBubbleZeros
+            , testMove
+        ]
 
 main : Element
 main = runDisplay tests

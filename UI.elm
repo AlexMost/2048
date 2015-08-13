@@ -19,13 +19,14 @@ cell row col num=
     let
         top = row * (span + space)
         left = col * (span + space)
-        (bgColor, color) = case num of
-            0 -> ("rgba(238, 228, 218, 0.35)", "black")
-            2 -> ("#eee4da", "black")
-            4 -> ("#ede0c8", "black")
-            8 -> ("#f2b179", "black")
-            16 -> ("#f59563", "black")
-            _ -> ("#f59563", "black")
+        symbol = toString num
+        (bgColor, color, numSymbol) = case num of
+            0 -> ("rgba(238, 228, 218, 0.35)", "black", "")
+            2 -> ("#eee4da", "black", symbol)
+            4 -> ("#ede0c8", "black", symbol)
+            8 -> ("#f2b179", "black", symbol)
+            16 -> ("#f59563", "black", symbol)
+            _ -> ("#f59563", "black", symbol)
     in
         div [style [
              ("position", "absolute")
@@ -42,7 +43,7 @@ cell row col num=
             ,("font-size", "40px")
             ,("font-weight", "bold")
         ]]
-        [text (toString num)]
+        [text numSymbol]
 
 
 mainView: Model -> Html

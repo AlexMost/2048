@@ -2,7 +2,9 @@ module Core (Model, getDirection,
   moveRows, 
   replaceRandomZero, 
   replaseZeroNTimes,
-  Direction(..)) where
+  Direction(..),
+  bubbleZeros,
+  move) where
 
 import List as List exposing(append, map, reverse, length, concat)
 import Array as Array exposing(fromList, get)
@@ -15,7 +17,14 @@ type alias Cells = List (List Int)
 type alias Model = {cells: Cells, seed: Random.Seed}
 type Direction = L | R | U | D | N
 
-move lst =
+bubbleZeros lst =
+  case lst of
+    [] -> []
+    0::tl -> append (bubbleZeros tl) [0]
+    x::tl -> x::bubbleZeros(tl)
+
+
+addSameNumbers lst =
   case lst of
     [] -> []
     0::tl -> append (move tl) [0]
@@ -25,6 +34,7 @@ move lst =
     x::[] -> [x]
     _ -> lst
 
+move = bubbleZeros >> addSameNumbers
 
 moveRows: Direction -> Model -> Model
 moveRows direction model = 
