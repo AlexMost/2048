@@ -1,6 +1,6 @@
 
-import Core exposing (Model, getDirection, moveRows, 
-  replaseZeroNTimes, replaceRandomZero, Direction(N))
+import Core exposing (Model, moveRows, 
+  replaseZeroNTimes, replaceRandomZero, Direction(..))
 
 import Graphics.Element as GE exposing(Element, show, flow, left, down)
 import Random
@@ -20,6 +20,15 @@ stage = [
   [0, 0, 0, 0]
   ]
 
+getDirection: {x: Int, y: Int} -> Direction
+getDirection {x, y} =
+    case (x, y) of
+      (-1, 0) -> L                   {-- left --}
+      (1, 0) -> R                    {-- right --}
+      (0, 1) -> U                    {-- up --}
+      (0, -1) -> D                   {-- down --}
+      _ -> N
+
 
 initModel = replaseZeroNTimes 4 {cells = stage, seed = Random.initialSeed 100}
 
@@ -31,10 +40,9 @@ update arrows model =
         movedModel = moveRows direction model
         modelWasChanged = model /= movedModel
     in
-        case (direction, modelWasChanged)  of
-            (N, _) -> model
-            (_, False) -> model
-            _ -> replaceRandomZero movedModel
+        if | modelWasChanged ->
+              replaceRandomZero movedModel
+           | otherwise -> model
 
 
 main : Signal Html

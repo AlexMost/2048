@@ -1,4 +1,4 @@
-module Core (Model, getDirection, 
+module Core (Model,
   moveRows, 
   replaceRandomZero, 
   replaseZeroNTimes,
@@ -16,6 +16,7 @@ import Utils exposing(trans, replaceZero, zerosMap)
 type alias Cells = List (List Int)
 type alias Model = {cells: Cells, seed: Random.Seed}
 type Direction = L | R | U | D | N
+
 
 bubbleZeros lst =
   case lst of
@@ -45,6 +46,7 @@ moveRows direction model =
   in 
     {model | cells <- 
         case direction of
+            N -> c
             L -> moveLeft c                   {-- left --}
             R -> moveRight c                   {-- right --}
             U -> trans c |> moveLeft |> trans {-- up --}
@@ -75,12 +77,3 @@ replaceRandomZero model =
 replaseZeroNTimes n model =
   if | n > 0 -> replaseZeroNTimes (n - 1) (replaceRandomZero model)
      | otherwise -> model
-
-getDirection: {x: Int, y: Int} -> Direction
-getDirection {x, y} =
-    case (x, y) of
-      (-1, 0) -> L                   {-- left --}
-      (1, 0) -> R                    {-- right --}
-      (0, 1) -> U                    {-- up --}
-      (0, -1) -> D                   {-- down --}
-      _ -> N
