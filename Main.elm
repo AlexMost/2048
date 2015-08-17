@@ -5,20 +5,17 @@ import Core exposing (Model, moveRows,
 import Graphics.Element as GE exposing(Element, show, flow, left, down)
 import Random
 import Keyboard
-import Signal
+import Signal as S
 import Html exposing (Html, div)
 import Debug
 import UI exposing(mainView)
 import List as List exposing(isEmpty, append, map, reverse, map4, filter, 
   length, sum, foldr, concat, take)
+import Core exposing (GameState(..))
 
 
-stage = [
-  [0, 0, 0, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0]
-  ]
+type Update = Arrows {x: Int, y: Int} | IsEnterDown Bool
+
 
 getDirection: {x: Int, y: Int} -> Direction
 getDirection {x, y} =
@@ -30,20 +27,56 @@ getDirection {x, y} =
       _ -> N
 
 
-initModel = replaseZeroNTimes 4 {cells = stage, seed = Random.initialSeed 100}
+updateBeforeStart : Bool -> Model -> GameState Model
+updateBeforeStart isEnter model =
+  if isEnter then OnAir model else BeforeStart model
 
 
-update: {x: Int, y: Int} -> Model -> Model
-update arrows model =
-    let
-        direction = (getDirection arrows)
-        movedModel = moveRows direction model
-        modelWasChanged = model /= movedModel
-    in
-        if | modelWasChanged ->
-              replaceRandomZero movedModel
-           | otherwise -> model
+updateOnAir : {x: Int, y: Int} -> Model -> GameState Model
+updateOnAir arrows model =
+  let
+    direction = getDirection arrows
+    movedModel = moveRows direction model
+    modelWasChanged = model /= movedModel
+  in    
+    if | modelWasChanged ->
+          OnAir (replaceRandomZero movedModel)
+       | otherwise -> OnAir model
+
+
+update: Update -> GameState Model -> GameState Model
+update upd model =
+  case (model, upd) of
+    ((BeforeStart state), IsEnterDown isEnter) ->
+      updateBeforeStart isEnter state
+
+    ((OnAir state), Arrows arrows) ->
+      updateOnAir arrows state
+      
+    _ -> model
+
+
+stage = [
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
+  [0, 0, 0, 0]
+  ]
+
+
+initState =
+  replaseZeroNTimes
+    4
+    {cells = stage, seed = Random.initialSeed 100}
 
 
 main : Signal Html
-main = Signal.map mainView (Signal.foldp update initModel Keyboard.arrows)
+main = S.map
+  mainView
+  (S.foldp
+    update
+    (BeforeStart initState)
+    (S.merge
+      (S.map Arrows Keyboard.arrows)
+      (S.map IsEnterDown Keyboard.enter)))
+

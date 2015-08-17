@@ -1,5 +1,5 @@
 module UI (mainView) where
-import Core exposing(Model)
+import Core exposing(Model, GameState(..))
 import Html exposing(Html, div, h1, text)
 import List exposing(indexedMap, concat, reverse)
 import Html.Attributes exposing (style)
@@ -46,14 +46,26 @@ cell row col num=
         [text numSymbol]
 
 
-mainView: Model -> Html
-mainView model =
+mainViewBeforeStart: Model -> Html
+mainViewBeforeStart state =
+    div [] [text "press Enter key to start"]
+
+
+mainViewOnAir: Model -> Html
+mainViewOnAir state =
     let
         drawRow rowIdx row = indexedMap (cell rowIdx) row
-        cells = concat (indexedMap drawRow model.cells)
+        cells = concat (indexedMap drawRow state.cells)
     in
         div
             [style [("padding-top", "70px")]]
             [
                 div [style containerStyles] cells
             ]
+
+
+mainView: GameState Model -> Html
+mainView model =
+    case model of
+        BeforeStart state -> mainViewBeforeStart state
+        OnAir state -> mainViewOnAir state

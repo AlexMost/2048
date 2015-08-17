@@ -3,6 +3,7 @@ module Core (Model,
   replaceRandomZero, 
   replaseZeroNTimes,
   Direction(..),
+  GameState(..),
   bubbleZeros,
   move) where
 
@@ -16,6 +17,7 @@ import Utils exposing(trans, replaceZero, zerosMap)
 type alias Cells = List (List Int)
 type alias Model = {cells: Cells, seed: Random.Seed}
 type Direction = L | R | U | D | N
+type GameState s = BeforeStart s | OnAir s | EndWin s | EndLoose s
 
 
 bubbleZeros lst =
