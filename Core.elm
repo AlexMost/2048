@@ -2,12 +2,14 @@ module Core (Model,
   moveRows, 
   replaceRandomZero, 
   replaseZeroNTimes,
+  countScore,
   Direction(..),
   GameState(..),
   bubbleZeros,
   move) where
 
-import List as List exposing(append, map, reverse, length, concat)
+import List as List exposing(append, map, reverse, length, concat,
+  maximum)
 import Array as Array exposing(fromList, get)
 import Dict
 import Random
@@ -15,7 +17,7 @@ import Maybe exposing(Maybe(..))
 import Utils exposing(trans, replaceZero, zerosMap)
 
 type alias Cells = List (List Int)
-type alias Model = {cells: Cells, seed: Random.Seed}
+type alias Model = {cells: Cells, seed: Random.Seed, score: Int}
 type Direction = L | R | U | D | N
 type GameState s = BeforeStart s | OnAir s | EndWin s | EndLoose s
 
@@ -79,3 +81,11 @@ replaceRandomZero model =
 replaseZeroNTimes n model =
   if | n > 0 -> replaseZeroNTimes (n - 1) (replaceRandomZero model)
      | otherwise -> model
+
+
+countScore: Model -> Model
+countScore model =
+  let
+    (Just max) = model.cells |> concat |> maximum 
+  in
+    {model | score <- max}

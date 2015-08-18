@@ -1,6 +1,6 @@
 module UI (mainView) where
 import Core exposing(Model, GameState(..))
-import Html exposing(Html, div, h1, text)
+import Html exposing(Html, div, h1, text, p)
 import List exposing(indexedMap, concat, reverse)
 import Html.Attributes exposing (style)
 
@@ -60,7 +60,8 @@ mainViewOnAir state =
         div
             [style [("padding-top", "70px")]]
             [
-                div [style containerStyles] cells
+                p [] [text ("Maximum score - " ++ (toString state.score))]
+                ,div [style containerStyles] cells
             ]
 
 

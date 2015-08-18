@@ -1,6 +1,6 @@
 
 import Core exposing (Model, moveRows, 
-  replaseZeroNTimes, replaceRandomZero, Direction(..))
+  replaseZeroNTimes, replaceRandomZero, Direction(..), countScore)
 
 import Graphics.Element as GE exposing(Element, show, flow, left, down)
 import Random
@@ -40,7 +40,10 @@ updateOnAir arrows model =
     modelWasChanged = model /= movedModel
   in    
     if | modelWasChanged ->
-          OnAir (replaceRandomZero movedModel)
+          OnAir (
+            movedModel 
+            |> replaceRandomZero
+            |> countScore)
        | otherwise -> OnAir model
 
 
@@ -65,9 +68,9 @@ stage = [
 
 
 initState =
-  replaseZeroNTimes
-    4
-    {cells = stage, seed = Random.initialSeed 100}
+  {cells = stage, seed = Random.initialSeed 100, score = 0}
+  |> (replaseZeroNTimes 4)
+  |> countScore
 
 
 main : Signal Html
