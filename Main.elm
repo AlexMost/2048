@@ -10,7 +10,7 @@ import Html exposing (Html, div)
 import Debug
 import UI exposing(mainView)
 import List as List exposing(isEmpty, append, map, reverse, map4, filter, 
-  length, sum, foldr, concat, take, all)
+  length, sum, foldr, concat, take, all, maximum)
 import Core exposing (GameState(..))
 
 
@@ -36,27 +36,26 @@ updateOnAir : {x: Int, y: Int} -> Model -> GameState Model
 updateOnAir arrows model =
   let
     direction = getDirection arrows
-    movedModel = moveRows direction model
     modelWasChanged = model /= movedModel
-    moveL = moveRows L model
-    moveR = moveRows R model
-    moveU = moveRows U model
-    moveD = moveRows D model
-    isLoose = all (\i -> i == model) [moveD, moveR, moveU, moveD]
+    isLoose = all
+      (\move -> (move model) == model)
+      [(moveRows L), (moveRows R), (moveRows U), (moveRows D)]
+    movedModel = moveRows direction model
+    modelWithScore = countScore movedModel
   in  
-    if  | isLoose -> EndLoose model
-        | modelWasChanged ->
-          OnAir (
-            movedModel 
-            |> replaceRandomZero
-            |> countScore)
-       | otherwise -> OnAir model
+    if  | modelWithScore.score == 2048 -> EndWin modelWithScore
+        | isLoose -> EndLoose model
+        | modelWasChanged ->OnAir (replaceRandomZero modelWithScore)
+        | otherwise -> OnAir model
 
 
 updateOnLoose: Bool -> Model -> GameState Model
 updateOnLoose isEnter model =
   if isEnter then OnAir initState else EndLoose model
 
+updateOnWin: Bool -> Model -> GameState Model
+updateOnWin isEnter model =
+  if isEnter then OnAir initState else EndWin model
 
 update: Update -> GameState Model -> GameState Model
 update upd model =
@@ -69,6 +68,9 @@ update upd model =
       
     ((EndLoose state), IsEnterDown isEnter) ->
       updateOnLoose isEnter state
+
+    ((EndWin state), IsEnterDown isEnter) ->
+      updateOnWin isEnter state
     _ -> model
 
 

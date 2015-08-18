@@ -54,6 +54,10 @@ mainViewOnLoose: Model -> Html
 mainViewOnLoose state =
     div [] [text "Looooooser, press Enter key to start again"]
 
+mainViewWin: Model -> Html
+mainViewWin state =
+    div [] [text "Yooohoooo, YOU ROCK !!!"]
+
 mainViewOnAir: Model -> Html
 mainViewOnAir state =
     let
@@ -74,3 +78,4 @@ mainView model =
         BeforeStart state -> mainViewBeforeStart state
         OnAir state -> mainViewOnAir state
         EndLoose state -> mainViewOnLoose state
+        EndWin state -> mainViewWin state
