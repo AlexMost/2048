@@ -50,6 +50,9 @@ mainViewBeforeStart: Model -> Html
 mainViewBeforeStart state =
     div [] [text "press Enter key to start"]
 
+mainViewOnLoose: Model -> Html
+mainViewOnLoose state =
+    div [] [text "Looooooser, press Enter key to start again"]
 
 mainViewOnAir: Model -> Html
 mainViewOnAir state =
@@ -70,3 +73,4 @@ mainView model =
     case model of
         BeforeStart state -> mainViewBeforeStart state
         OnAir state -> mainViewOnAir state
+        EndLoose state -> mainViewOnLoose state

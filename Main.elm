@@ -10,7 +10,7 @@ import Html exposing (Html, div)
 import Debug
 import UI exposing(mainView)
 import List as List exposing(isEmpty, append, map, reverse, map4, filter, 
-  length, sum, foldr, concat, take)
+  length, sum, foldr, concat, take, all)
 import Core exposing (GameState(..))
 
 
@@ -38,13 +38,24 @@ updateOnAir arrows model =
     direction = getDirection arrows
     movedModel = moveRows direction model
     modelWasChanged = model /= movedModel
-  in    
-    if | modelWasChanged ->
+    moveL = moveRows L model
+    moveR = moveRows R model
+    moveU = moveRows U model
+    moveD = moveRows D model
+    isLoose = all (\i -> i == model) [moveD, moveR, moveU, moveD]
+  in  
+    if  | isLoose -> EndLoose model
+        | modelWasChanged ->
           OnAir (
             movedModel 
             |> replaceRandomZero
             |> countScore)
        | otherwise -> OnAir model
+
+
+updateOnLoose: Bool -> Model -> GameState Model
+updateOnLoose isEnter model =
+  if isEnter then OnAir initState else EndLoose model
 
 
 update: Update -> GameState Model -> GameState Model
@@ -56,6 +67,8 @@ update upd model =
     ((OnAir state), Arrows arrows) ->
       updateOnAir arrows state
       
+    ((EndLoose state), IsEnterDown isEnter) ->
+      updateOnLoose isEnter state
     _ -> model
 
 
