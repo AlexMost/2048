@@ -37,15 +37,13 @@ updateOnAir arrows model =
   let
     direction = getDirection arrows
     modelWasChanged = model /= movedModel
-    isLoose = all
-      (\move -> (move model) == model)
-      [(moveRows L), (moveRows R), (moveRows U), (moveRows D)]
+    isLoose = all (\d -> (moveRows d model) == model) [L, R, U, D]
     movedModel = moveRows direction model
     modelWithScore = countScore movedModel
   in  
     if  | modelWithScore.score == 2048 -> EndWin modelWithScore
         | isLoose -> EndLoose model
-        | modelWasChanged ->OnAir (replaceRandomZero modelWithScore)
+        | modelWasChanged -> OnAir (replaceRandomZero modelWithScore)
         | otherwise -> OnAir model
 
 
@@ -71,6 +69,7 @@ update upd model =
 
     ((EndWin state), IsEnterDown isEnter) ->
       updateOnWin isEnter state
+
     _ -> model
 
 
