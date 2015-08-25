@@ -12,10 +12,24 @@ containerStyles = [
    ,("width", "450px")
    ,("height", "450px")
    ,("border", "1px solid black")
-   ,("margin", "auto")
     ]
 
-cell row col num=
+mask: Html
+mask =
+    (div [style [
+      ("position", "absolute")
+     ,("top", "0")
+     ,("left", "0")
+     ,("opacity", "0.7")
+     ,("background", "#FFF")
+     ,("width", "450px")
+     ,("height", "450px")
+     ,("z-index", "1000")
+    ]]
+    [])
+
+
+cell row col num =
     let
         top = row * (span + space)
         left = col * (span + space)
@@ -48,34 +62,74 @@ cell row col num=
 
 mainViewBeforeStart: Model -> Html
 mainViewBeforeStart state =
-    div [] [text "press Enter key to start"]
+    div
+        []
+        [
+            p [] [text "Press Enter key to start"]
+            ,div [style containerStyles] (mask :: (drawCells state))
+        ]
 
 mainViewOnLoose: Model -> Html
 mainViewOnLoose state =
-    div [] [text "Looooooser, press Enter key to start again"]
+    div
+        []
+        [
+            p [] [text "Looooooser, press Enter key to start again"]
+            ,div [style containerStyles] (mask :: (drawCells state))
+        ]
+
 
 mainViewWin: Model -> Html
 mainViewWin state =
-    div [] [text "Yooohoooo, YOU ROCK !!!"]
+    div
+        []
+        [
+            p [] [text "Yooohoooo, YOU ROCK !!!"]
+            ,div [style containerStyles] (mask :: (drawCells state))
+        ]
+
+
+drawCells: Model -> List Html
+drawCells state =
+    let
+        drawRow rowIdx row = indexedMap (cell rowIdx) row
+    in
+        concat (indexedMap drawRow state.cells)
 
 mainViewOnAir: Model -> Html
 mainViewOnAir state =
-    let
-        drawRow rowIdx row = indexedMap (cell rowIdx) row
-        cells = concat (indexedMap drawRow state.cells)
-    in
-        div
-            [style [("padding-top", "70px")]]
-            [
-                p [] [text ("Maximum score - " ++ (toString state.score))]
-                ,div [style containerStyles] cells
-            ]
+    div
+        []
+        [
+            p [] [text ("Maximum score - " ++ (toString state.score))]
+            ,div [style containerStyles] (drawCells state)
+        ]
 
 
 mainView: GameState Model -> Html
 mainView model =
-    case model of
-        BeforeStart state -> mainViewBeforeStart state
-        OnAir state -> mainViewOnAir state
-        EndLoose state -> mainViewOnLoose state
-        EndWin state -> mainViewWin state
+    div [style [
+        ("justify-content", "center")
+        ,("display", "flex")
+        ,("position", "relative")
+        ,("width", "100%")]]
+
+        [
+            div
+                [style [
+                     ("flex-direction", "column")
+                    ,("justify-content", "center")
+                    ,("display", "flex")
+                    ,("position", "relative")
+                    ,("align-items", "center")
+                    ,("width", "450px")
+                    ,("height", "100%")
+                    ]]
+                [
+                    case model of
+                        BeforeStart state -> mainViewBeforeStart state
+                        OnAir state -> mainViewOnAir state
+                        EndLoose state -> mainViewOnLoose state
+                        EndWin state -> mainViewWin state
+                ]
+        ]
