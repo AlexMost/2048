@@ -96,12 +96,13 @@ drawCells state =
     in
         concat (indexedMap drawRow state.cells)
 
+
 mainViewOnAir: Model -> Html
 mainViewOnAir state =
     div
         []
         [
-            p [] [text ("Maximum score - " ++ (toString state.score))]
+            p [] [text ("Score - " ++ (toString state.score))]
             ,div [style containerStyles] (drawCells state)
         ]
 
@@ -126,6 +127,7 @@ mainView model =
                     ,("height", "100%")
                     ]]
                 [
+                    h1 [] [text "2048 in Elm"],
                     case model of
                         BeforeStart state -> mainViewBeforeStart state
                         OnAir state -> mainViewOnAir state
