@@ -1,32 +1,18 @@
 module UI (mainView) where
-import Core exposing(Model, GameState(..))
-import Html exposing(Html, div, h1, text, p)
+import Core exposing(Model, GameState(..), Update(..))
+import Html exposing(..)
+import Html.Events exposing (..)
 import List exposing(indexedMap, concat, reverse)
 import Html.Attributes exposing (style)
+import Signal exposing (Address)
+import Style exposing(containerStyle, maskStyle, mainWrapperStyle,
+    wrapperStyle, gameInfoStyle, restartBtnStyle)
 
 span = 100
 space = 10
 
-containerStyles = [
-    ("position", "relative")
-   ,("width", "450px")
-   ,("height", "450px")
-   ,("border", "1px solid black")
-    ]
-
 mask: Html
-mask =
-    (div [style [
-      ("position", "absolute")
-     ,("top", "0")
-     ,("left", "0")
-     ,("opacity", "0.7")
-     ,("background", "#FFF")
-     ,("width", "450px")
-     ,("height", "450px")
-     ,("z-index", "1000")
-    ]]
-    [])
+mask = (div [style maskStyle] [])
 
 
 cell row col num =
@@ -60,32 +46,53 @@ cell row col num =
         [text numSymbol]
 
 
-mainViewBeforeStart: Model -> Html
-mainViewBeforeStart state =
+mainViewBeforeStart: Address Update -> Model -> Html
+mainViewBeforeStart address state =
     div
         []
         [
-            p [] [text "Press Enter key to start"]
-            ,div [style containerStyles] (mask :: (drawCells state))
+            div [style gameInfoStyle]
+                [
+                    p [] [text "Press Enter key to start"]
+                    , button [
+                        style restartBtnStyle
+                        ,(onClick address Start)]
+                        [text "Start"]
+                ]
+            ,div [style containerStyle] (mask :: (drawCells state))
         ]
 
-mainViewOnLoose: Model -> Html
-mainViewOnLoose state =
+mainViewOnLoose: Address Update -> Model -> Html
+mainViewOnLoose address state =
     div
         []
         [
-            p [] [text "Looooooser, press Enter key to start again"]
-            ,div [style containerStyles] (mask :: (drawCells state))
+            div [style gameInfoStyle]
+                [
+                    p [] [text "Looooooser, press Enter key to start again"]
+                    ,button [
+                        style restartBtnStyle
+                        ,(onClick address Restart)]
+                        [text "Restart"]
+                ]
+            ,div [style containerStyle] (mask :: (drawCells state))
         ]
 
 
-mainViewWin: Model -> Html
-mainViewWin state =
+mainViewWin: Address Update -> Model -> Html
+mainViewWin address state =
     div
         []
         [
-            p [] [text "Yooohoooo, YOU ROCK !!!"]
-            ,div [style containerStyles] (mask :: (drawCells state))
+            div [style gameInfoStyle]
+                [
+                    p [] [text "Yooohoooo, YOU ROCK !!!"]
+                    ,button [
+                        style restartBtnStyle
+                        ,(onClick address Restart)]
+                        [text "Restart"]
+                ]
+            ,div [style containerStyle] (mask :: (drawCells state))
         ]
 
 
@@ -97,41 +104,35 @@ drawCells state =
         concat (indexedMap drawRow state.cells)
 
 
-mainViewOnAir: Model -> Html
-mainViewOnAir state =
+mainViewOnAir: Address Update -> Model -> Html
+mainViewOnAir address state =
     div
         []
         [
-            p [] [text ("Score - " ++ (toString state.score))]
-            ,div [style containerStyles] (drawCells state)
+            div [style gameInfoStyle]
+                [
+                    p [] [text ("Score - " ++ (toString state.score))]
+                    , button [
+                        style restartBtnStyle
+                        ,(onClick address Restart)]
+                        [text "Restart"]
+                ]
+            , div [style containerStyle] (drawCells state)    
         ]
 
 
-mainView: GameState Model -> Html
-mainView model =
-    div [style [
-        ("justify-content", "center")
-        ,("display", "flex")
-        ,("position", "relative")
-        ,("width", "100%")]]
-
+mainView: Address Update -> GameState Model -> Html
+mainView address model =
+    div [style mainWrapperStyle]
         [
             div
-                [style [
-                     ("flex-direction", "column")
-                    ,("justify-content", "center")
-                    ,("display", "flex")
-                    ,("position", "relative")
-                    ,("align-items", "center")
-                    ,("width", "450px")
-                    ,("height", "100%")
-                    ]]
+                [style wrapperStyle]
                 [
                     h1 [] [text "2048 in Elm"],
                     case model of
-                        BeforeStart state -> mainViewBeforeStart state
-                        OnAir state -> mainViewOnAir state
-                        EndLoose state -> mainViewOnLoose state
-                        EndWin state -> mainViewWin state
+                        BeforeStart state -> mainViewBeforeStart address state
+                        OnAir state -> mainViewOnAir address state
+                        EndLoose state -> mainViewOnLoose address state
+                        EndWin state -> mainViewWin address state
                 ]
         ]

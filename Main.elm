@@ -1,6 +1,7 @@
 
 import Core exposing (Model, moveRows, 
-  replaseZeroNTimes, replaceRandomZero, Direction(..), countScore)
+  replaseZeroNTimes, replaceRandomZero, Direction(..), countScore,
+  Update(..))
 
 import Graphics.Element as GE exposing(Element, show, flow, left, down)
 import Random
@@ -14,7 +15,8 @@ import List as List exposing(isEmpty, append, map, reverse, map4, filter,
 import Core exposing (GameState(..))
 
 
-type Update = Arrows {x: Int, y: Int} | IsEnterDown Bool
+uiMailBox: Signal.Mailbox Update
+uiMailBox = Signal.mailbox NoAction
 
 
 getDirection: {x: Int, y: Int} -> Direction
@@ -61,6 +63,8 @@ update upd model =
     ((BeforeStart state), IsEnterDown isEnter) ->
       updateBeforeStart isEnter state
 
+    ((BeforeStart state), Start) -> OnAir initState
+
     ((OnAir state), Arrows arrows) ->
       updateOnAir arrows state
       
@@ -69,6 +73,12 @@ update upd model =
 
     ((EndWin state), IsEnterDown isEnter) ->
       updateOnWin isEnter state
+
+    (OnAir state, Restart) -> OnAir initState
+
+    (EndLoose state, Restart) -> OnAir initState
+
+    (EndWin state, Restart) -> OnAir initState
 
     _ -> model
 
@@ -89,11 +99,15 @@ initState =
 
 main : Signal Html
 main = S.map
-  mainView
+  (mainView uiMailBox.address)
   (S.foldp
     update
     (BeforeStart initState)
-    (S.merge
-      (S.map Arrows Keyboard.arrows)
-      (S.map IsEnterDown Keyboard.enter)))
+    (S.mergeMany
+      [
+        (S.map Arrows Keyboard.arrows)
+        ,(S.map IsEnterDown Keyboard.enter)
+        ,uiMailBox.signal
+      ]
+    ))
 

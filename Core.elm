@@ -5,6 +5,7 @@ module Core (Model,
   countScore,
   Direction(..),
   GameState(..),
+  Update(..),
   bubbleZeros,
   move) where
 
@@ -20,6 +21,11 @@ type alias Cells = List (List Int)
 type alias Model = {cells: Cells, seed: Random.Seed, score: Int}
 type Direction = L | R | U | D | N
 type GameState s = BeforeStart s | OnAir s | EndWin s | EndLoose s
+type Update = Arrows {x: Int, y: Int}
+              | IsEnterDown Bool
+              | Start
+              | Restart
+              | NoAction
 
 
 bubbleZeros lst =
